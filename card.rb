@@ -6,4 +6,3 @@ class Card
     @suit = suit
   end
 end
-

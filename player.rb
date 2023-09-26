@@ -23,6 +23,18 @@ class Player
     total
   end
 
+  def deduct_from_bank(amount)
+    @bank -= amount
+  end
+
+  def add_to_bank(amount)
+    @bank += amount
+  end
+
+  def clear_hand
+    @hand = []
+  end
+
   private
 
   def card_value(rank)
