@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class Player
-  attr_reader :name, :bank, :hand
+  attr_accessor :name, :bank, :hand
 
   def initialize(name, bank)
     @name = name
@@ -15,7 +17,7 @@ class Player
     total = @hand.sum { |card| card_value(card.rank) }
     aces = @hand.count { |card| card.rank == 'A' }
 
-    while aces > 0 && total > 21
+    while aces.positive? && total > 21
       total -= 10
       aces -= 1
     end

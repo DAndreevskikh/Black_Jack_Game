@@ -1,34 +1,48 @@
-Feature: Blackjack Game
+Feature: Playing a game of Blackjack
 
-  Background:
-    Given a new game is started
-
-  Scenario: Player skips the round
-    When the player skips their turn
-    Then the round should end without additional cards dealt
-    And the dealer's turn should start
+  Scenario: Player wins by having a higher hand value
+    Given the initial bank for the player is 100
+    And the initial bank for the dealer is 100
+    When the game starts
+    And the player chooses to add a card
+    And the player chooses to skip
+    And the dealer chooses to add a card
+    And the dealer chooses to skip
+    Then the game should end
+    And the final bank for the player should be 110
+    And the final bank for the dealer should be 90
 
   Scenario: Player goes bust
-    When the player adds a card
-    And the player adds another card
-    And the player adds a third card
-    And the player adds a fourth card
-    And the player opens their cards
-    Then the round should end
-    And the player should lose
+    Given the initial bank for the player is 100
+    And the initial bank for the dealer is 100
+    When the game starts
+    And the player chooses to add a card
+    And the player chooses to add a card
+    And the player chooses to add a card
+    Then the game should end
+    And the final bank for the player should be 90
+    And the final bank for the dealer should be 110
 
-  Scenario: Player and dealer tie
-    When the player adds a card
-    And the dealer adds a card
-    And the player opens their cards
-    And the dealer opens their cards
-    Then the round should end in a tie
+  Scenario: Dealer wins by having a higher hand value
+    Given the initial bank for the player is 100
+    And the initial bank for the dealer is 100
+    When the game starts
+    And the player chooses to skip
+    And the dealer chooses to add a card
+    And the dealer chooses to add a card
+    And the dealer chooses to skip
+    Then the game should end
+    And the final bank for the player should be 90
+    And the final bank for the dealer should be 110
 
-  Scenario: Player adds cards and wins with more than 100 in bank
-    When the player adds a card
-    And the player adds another card
-    And the player adds a third card
-    And the player opens their cards
-    Then the round should end
-    And the dealer should lose
-    And the player's bank should be greater than 100
+  Scenario: Dealer goes bust
+    Given the initial bank for the player is 100
+    And the initial bank for the dealer is 100
+    When the game starts
+    And the player chooses to skip
+    And the dealer chooses to add a card
+    And the dealer chooses to add a card
+    And the dealer chooses to add a card
+    Then the game should end
+    And the final bank for the player should be 110
+    And the final bank for the dealer should be 90
