@@ -12,8 +12,8 @@ class Game
       break if @dealer.bank.zero?
 
       deal_initial_cards
-      take_bets
       player_turn
+      take_bets
       dealer_turn unless @player.hand_value > 21
       end_game
       break unless play_again
@@ -112,34 +112,41 @@ class Game
   end
 
   def end_game
-    show_result
-    update_player_bank
-    reset_game
-  end
+  show_result
+  update_player_bank
+  reset_game
+end
 
-  def show_result
-    player_score = @player.hand_value
-    dealer_score = @dealer.hand_value
+def show_result
+  player_score = @player.hand_value
+  dealer_score = @dealer.hand_value
 
-    puts 'Результат:'
-    puts "Ваша рука: #{hand_to_string(@player.hand)}"
-    puts "Ваши очки: #{player_score}"
-    puts 'Дилер:'
-    puts hand_to_string(@dealer.hand)
-    puts "Очки дилера: #{dealer_score}"
+  puts 'Результат:'
+  puts "Ваша рука: #{hand_to_string(@player.hand)}"
+  puts "Ваши очки: #{player_score}"
+  puts 'Дилер:'
+  puts hand_to_string(@dealer.hand)
+  puts "Очки дилера: #{dealer_score}"
 
-    if @player.bank.zero?
-      puts 'У Игрока закончились деньги в банке. Пополните Банк и приходите снова.'
-    elsif @dealer.bank.zero?
-      puts 'Дилер пуст, Вы его обчистели. Удачно покутить.'
-    elsif player_score > 21 || (dealer_score <= 21 && dealer_score >= player_score)
-      puts 'Дилер выиграл!'
-    elsif dealer_score > 21 || (player_score <= 21 && player_score > dealer_score)
-      puts 'Вы выиграли!'
-    else
+  if @player.bank.zero?
+    puts 'У Игрока закончились деньги в банке. Пополните Банк и приходите снова.'
+  elsif @dealer.bank.zero?
+    puts 'Дилер пуст, Вы его обчистели. Удачно покутить.'
+  elsif player_score > 21 || (dealer_score <= 21 && dealer_score >= player_score)
+    puts 'Дилер выиграл!'
+  elsif dealer_score > 21 || (player_score <= 21 && player_score > dealer_score)
+    puts 'Вы выиграли!'
+  else
+    if player_score == dealer_score
       puts 'Ничья!'
+      @player.add_to_bank(10)
+      @dealer.add_to_bank(10)
+    else
+      puts 'Ничьи нет!'
     end
   end
+end
+
 
   def update_player_bank
     if @player.hand_value > 21 || (@dealer.hand_value <= 21 && @dealer.hand_value >= @player.hand_value)
