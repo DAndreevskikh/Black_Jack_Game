@@ -35,6 +35,13 @@ class Game
       @player.add_to_hand(@deck.draw)
       @dealer.add_to_hand(@deck.draw)
     end
+
+    return unless @player.hand_value == 21
+
+    show_game_status
+    puts 'Congratulations! You have a Blackjack!'
+    @player.add_to_bank(20)
+    reset_game
   end
 
   def take_bets
@@ -56,10 +63,9 @@ class Game
       when 'skip'
         break
       when 'add_card'
-        if @player.hand_value <= 21
+        if @player.hand_value <= 21 && @player.hand.length < 3
           new_card = @deck.draw
           @player.add_to_hand(new_card)
-          adjust_ace_value if new_card.rank == 'A'
         else
           puts 'Invalid choice. You cannot add a card now.'
         end
@@ -69,21 +75,10 @@ class Game
         puts 'Invalid choice. Please choose "skip," "add_card," or "open_cards."'
       end
     end
-    return unless @player.hand_value <= 21
+
+    return if @player.hand_value > 21
 
     open_cards
-  end
-
-  def adjust_ace_value
-    @player.hand.each do |card|
-      if card.rank == 'A'
-        if @player.hand_value + 11 <= 21
-          card.value = 11
-        else
-          card.value = 1
-        end
-      end
-    end
   end
 
   def show_game_status
@@ -132,19 +127,9 @@ class Game
       else
         @dealer.add_to_hand(card)
       end
-    end
-  end
 
-  def end_game
-    if @player.hand_value <= 21
-      show_result
-      update_player_bank
-    else
-      puts 'Your hand is over 21. You lose!'
-      @dealer.add_to_bank(20)
+      break if @dealer.hand_value >= 21
     end
-
-    reset_game
   end
 
   def show_result
@@ -158,20 +143,23 @@ class Game
     puts hand_to_string(@dealer.hand)
     puts "Dealer's Points: #{dealer_score}"
 
-    if @player.bank.zero?
+    if player_score > 21 || (dealer_score <= 21 && dealer_score > player_score)
+      puts 'Dealer wins!'
+      @dealer.add_to_bank(20)
+    elsif dealer_score > 21 || (player_score <= 21 && player_score > dealer_score)
+      puts 'You win!'
+      @player.add_to_bank(20)
+    elsif player_score == dealer_score
+      puts "It's a tie!"
+      @player.add_to_bank(10)
+      @dealer.add_to_bank(10)
+    elsif @player.bank.zero?
       puts 'Player is out of money. Please replenish your bank and come back.'
     elsif @dealer.bank.zero?
       puts 'The dealer is broke. You cleaned him out. Good job!'
-    elsif player_score > 21 || (dealer_score <= 21 && dealer_score >= player_score)
-      puts 'Dealer wins!'
-    elsif dealer_score > 21 || (player_score <= 21 && player_score > dealer_score)
-      puts 'You win!'
-    elsif player_score == dealer_score
-      puts 'Its a tie!'
-      @player.add_to_bank(10)
-      @dealer.add_to_bank(10)
     else
       puts 'No tie!'
+      update_player_bank
     end
   end
 
@@ -208,4 +196,15 @@ class Game
     reset_game if choice == '1'
     choice == '1'
   end
+end
+
+def end_game
+  if @player.hand_value <= 21
+    show_result
+  else
+    puts 'Your hand is over 21. You lose!'
+    @dealer.add_to_bank(20)
+  end
+
+  reset_game
 end
